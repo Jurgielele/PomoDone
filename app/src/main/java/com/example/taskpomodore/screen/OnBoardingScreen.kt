@@ -73,7 +73,6 @@ fun OnBoardingScreen(
                 pagerState = pagerState,
             )
     }
-
 }
 
 //PAGES
