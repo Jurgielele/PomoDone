@@ -1,4 +1,4 @@
-package com.example.taskpomodore.data
+package com.example.taskpomodore.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore

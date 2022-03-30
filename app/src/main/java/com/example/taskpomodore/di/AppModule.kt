@@ -1,7 +1,11 @@
 package com.example.taskpomodore.di
 
 import android.content.Context
-import com.example.taskpomodore.data.DataStoreRepository
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.example.taskpomodore.data.TodoDatabase
+import com.example.taskpomodore.data.TodoDatabaseDao
+import com.example.taskpomodore.repository.DataStoreRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +16,24 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object MainModule{
-    @Provides
+
     @Singleton
+    @Provides
     fun provideDataStoreRepository(@ApplicationContext context: Context) = DataStoreRepository(context)
+
+    @Singleton
+    @Provides
+    fun provideTodoDao(todoDatabase: TodoDatabase): TodoDatabaseDao = todoDatabase.taskDao()
+
+    @Singleton
+    @Provides
+    fun provideTodoDatabase(@ApplicationContext context: Context): TodoDatabase {
+        return Room.databaseBuilder(
+            context,
+            TodoDatabase::class.java,
+            "todo_db"
+        ).fallbackToDestructiveMigration()
+            .build()
+    }
+
 }
