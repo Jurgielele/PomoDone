@@ -7,7 +7,7 @@ sealed class OnBoardingPage(
 ) {
     object First : OnBoardingPage(
         title = "Hi, it’s looks like you new here!",
-        description = ""
+        description = "",
     )
 
     object Second : OnBoardingPage(

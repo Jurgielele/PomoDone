@@ -30,7 +30,6 @@ fun Header(name: String, pomodoroActive:Boolean, onPomodoroButtonClicked: () -> 
         .fillMaxWidth()
         .padding(14.dp)
     ) {
-        Icon(Icons.Default.Menu, "", tint = Color.White )
         if(!pomodoroActive){
             Divider(modifier = Modifier.heightIn(20.dp), color = Color.Transparent)
         }
