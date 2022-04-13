@@ -74,7 +74,7 @@ fun HomeScreen(navController: NavHostController, todosViewModel: TodosViewModel 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
-        backgroundColor = (Color(0xff5F5FFF)),
+        backgroundColor = if(activeItem == "Info") White else Color(0xff5F5FFF),
         drawerContent = { DrawerContent(
             "Patryk Jurgielewicz",
             activeItem,
@@ -83,13 +83,15 @@ fun HomeScreen(navController: NavHostController, todosViewModel: TodosViewModel 
         )},
         drawerShape = customShape(screenWidth, screenHeight),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    todosViewModel.addTodoRowActive.value = !todosViewModel.addTodoRowActive.value},
-                backgroundColor = Color(0xff5F5FFF),
-                contentColor = White
-            ) {
-                Text("+", fontSize = 30.sp, fontWeight = Bold)
+            if(activeItem == "List" || activeItem.isEmpty()){
+                FloatingActionButton(
+                    onClick = {
+                        todosViewModel.addTodoRowActive.value = !todosViewModel.addTodoRowActive.value},
+                    backgroundColor = Color(0xff5F5FFF),
+                    contentColor = White
+                ) {
+                    Text("+", fontSize = 30.sp, fontWeight = Bold)
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.End
@@ -98,7 +100,7 @@ fun HomeScreen(navController: NavHostController, todosViewModel: TodosViewModel 
             Icon(
                 Icons.Default.Menu,
                 "",
-                tint = White,
+                tint = if(activeItem == "Info") Black else White,
                 modifier = Modifier
                     .padding(start = 12.dp, top = 12.dp)
                     .clickable {
