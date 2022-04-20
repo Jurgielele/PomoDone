@@ -1,5 +1,7 @@
 package com.example.taskpomodore.composables
 
+import android.os.CountDownTimer
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,17 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.taskpomodore.model.Status
+import com.example.taskpomodore.model.Status.FINISHED
 import com.example.taskpomodore.utils.millisToMinSec
+import com.example.taskpomodore.viewmodel.TimerViewModel
 import kotlinx.coroutines.delay
+import java.time.Duration
 
 @Composable
 fun Header(name: String, pomodoroActive:Boolean, onPomodoroButtonClicked: () -> Unit){
-    var pomodoroTime by remember{ mutableStateOf(0L) }
-    val updateTime: (Boolean) -> Unit = remember(pomodoroActive){{
-        if(!it){
-            pomodoroTime = 1_500_000L
-        }
-    }}
+    val timerViewModel: TimerViewModel= TimerViewModel()
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(14.dp)
@@ -33,16 +35,24 @@ fun Header(name: String, pomodoroActive:Boolean, onPomodoroButtonClicked: () -> 
         if(!pomodoroActive){
             Divider(modifier = Modifier.heightIn(20.dp), color = Color.Transparent)
         }
-        updateTime(pomodoroActive)
         if(!pomodoroActive){
-            WelcomeHeader(name, onPomodoroButtonClicked)
+            WelcomeHeader(name){
+                timerViewModel.startTime(Duration.ofSeconds(1500))
+                onPomodoroButtonClicked()
+            }
         }else{
-            TimerHeader(pomodoroTime, pomodoroActive, onTick = {
-                pomodoroTime-= 1000
-            }, onPomodoroButtonClicked)
+            TimerHeader(
+                timerViewModel = timerViewModel,
+                pomodoroActive = pomodoroActive,
+            ){
+                timerViewModel.resetTimer()
+                onPomodoroButtonClicked()
+            }
+
         }
     }
 }
+
 @Composable
 private fun WelcomeHeader(name: String, onPomodoroButtonClicked: () -> Unit) {
     Text(
@@ -71,59 +81,60 @@ private fun WelcomeHeader(name: String, onPomodoroButtonClicked: () -> Unit) {
 
 @Composable
 private fun TimerHeader(
-    pomodoroTime: Long,
+    timerViewModel: TimerViewModel,
     pomodoroActive: Boolean,
-    onTick: ()-> Unit,
     onPomodoroButtonClicked: () -> Unit
 ) {
-    LaunchedEffect(key1 = pomodoroTime, key2 = pomodoroActive) {
-        if (pomodoroTime > 0 && pomodoroActive) {
-            delay(1000)
-            onTick()
-        }
+    if(timerViewModel.viewState.value.status == Status.STARTED){
+        timerViewModel.startTime(Duration.ofSeconds(1500))
     }
-    Column(modifier= Modifier.fillMaxWidth(),
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = millisToMinSec(pomodoroTime),
-            fontWeight = FontWeight.Bold,
-            fontSize = 64.sp,
-            color = Color.White,
-            lineHeight = 96.sp
-        )
-        Button(
-            onClick = onPomodoroButtonClicked,
-            shape = RoundedCornerShape(20.dp),
-            colors =
-            ButtonDefaults.buttonColors(backgroundColor = Color.White)
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+            Text(
+                text = millisToMinSec(timerViewModel.viewState.value.remainingTime),
+                fontWeight = FontWeight.Bold,
+                fontSize = 64.sp,
+                color = Color.White,
+                lineHeight = 96.sp
+            )
+            Log.d("TimerCheck", millisToMinSec(timerViewModel.viewState.value.remainingTime))
+            Button(
+                onClick = {
+                    onPomodoroButtonClicked()
+                    if (pomodoroActive) timerViewModel.resetTimer()
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors =
+                ButtonDefaults.buttonColors(backgroundColor = Color.White)
             ) {
-                Box(
+                Row(
                     modifier = Modifier
-                        .size(15.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color(0xffFF8383))
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    "Stop pomodoro",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 18.sp,
-                    color = Color(
-                        0xff5F5FFF
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(15.dp)
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(Color(0xffFF8383))
                     )
-                )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        "Stop pomodoro",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 18.sp,
+                        color = Color(
+                            0xff5F5FFF
+                        )
+                    )
+                }
             }
         }
-    }
 }
-
 
 @Preview
 @Composable

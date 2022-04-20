@@ -70,7 +70,6 @@ fun HomeScreen(navController: NavHostController, todosViewModel: TodosViewModel 
     val screenHeight = (configuration.screenHeightDp.toFloat() * screenDensity).toInt()
     val screenWidth = (configuration.screenWidthDp.toFloat() * screenDensity * 0.6).toInt()
     var activeItem by remember { mutableStateOf("")}
-    var infoSelected by remember{ mutableStateOf(false)}
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
